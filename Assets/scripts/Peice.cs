@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,5 +24,54 @@ public class Peice : MonoBehaviour
       {
          this.cells[i] =(Vector3Int) data.cells[i];
       }
+   }
+
+   private void Update()
+   {
+      this.board.clear(this);
+      if (Input.GetKeyDown(KeyCode.A))
+      {
+         move(Vector2Int.left);
+         }
+      else if (Input.GetKeyDown(KeyCode.D))
+      {
+         move(Vector2Int.right);
+      }
+      else if (Input.GetKeyDown(KeyCode.S))
+      {
+         move(Vector2Int.down);
+      }
+      else if (Input.GetKeyDown(KeyCode.W))
+      {
+         move(Vector2Int.up);
+      }
+      else if (Input.GetKeyDown(KeyCode.Space))
+      {
+            hardDrop();
+      }
+      this.board.set(this);
+   }
+
+   private void hardDrop()
+   {
+      while (move(Vector2Int.down))
+      {
+         continue;
+      }
+   }
+
+   private bool move(Vector2Int translation)
+   {
+      Vector3Int newPosition = this.position;
+      newPosition.x += translation.x;
+      newPosition.y += translation.y;
+
+      bool valid = this.board.isValidPosition(this,newPosition);
+      if (valid)
+      {
+         this.position = newPosition;
+      }
+
+      return valid;
    }
 }
