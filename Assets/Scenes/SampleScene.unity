@@ -492,7 +492,7 @@ MonoBehaviour:
     tile: {fileID: 11400000, guid: b7418ab54c154ca4db1a7735e5d7af21, type: 2}
   - tetromino: 6
     tile: {fileID: 11400000, guid: 19dbc7f5334af8c49af1f806cd609e4d, type: 2}
-  activePosition: {x: 0, y: 0, z: 0}
+  activePosition: {x: -1, y: 8, z: 0}
   boardSize: {x: 10, y: 20}
 --- !u!156049354 &1292880040
 Grid:
