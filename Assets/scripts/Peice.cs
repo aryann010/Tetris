@@ -11,12 +11,20 @@ public class Peice : MonoBehaviour
    public TetrominoData data { get; private set; }
    public Vector3Int[] cells { get; private set; }
    public int rotationIndex { get; private set; }
+
+   public float stepDelay = 1f;
+   public float lockDelay = 0.5f;
+
+   private float stepTime;
+   private float lockTime;
    public void Initialize(Board board, Vector3Int position,TetrominoData data)
    {
       this.board = board;
       this.position = position;
       this.data = data;
       this.rotationIndex = 0;
+      this.stepTime = Time.time + stepDelay;
+      this.lockTime = 0f;
       if (cells == null)
       {
          this.cells = new Vector3Int[4];
@@ -30,7 +38,10 @@ public class Peice : MonoBehaviour
 
    private void Update()
    {
+      
+      
       this.board.clear(this);
+      this.lockTime += Time.deltaTime;
       if (Input.GetKeyDown(KeyCode.A))
       {
          move(Vector2Int.left);
@@ -59,8 +70,29 @@ public class Peice : MonoBehaviour
       {
          rotate(1);
       }
-      
+
+      if (Time.time > this.stepTime)
+      {
+         step();
+      }
+
       this.board.set(this);
+   }
+
+   private void step()
+   {
+      this.stepTime = Time.time + this.stepDelay;
+      move(Vector2Int.down);
+      if (this.lockTime >= this.lockDelay)
+      {
+         Lock();
+      }
+   }
+
+   private void Lock()
+   {
+      this.board.set(this);
+      this.board.spawn();
    }
 
    private void hardDrop()
@@ -69,6 +101,7 @@ public class Peice : MonoBehaviour
       {
          continue;
       }
+      Lock();
    }
 
    private bool move(Vector2Int translation)
@@ -81,6 +114,7 @@ public class Peice : MonoBehaviour
       if (valid)
       {
          this.position = newPosition;
+         this.lockTime = 0f;
       }
 
       return valid;
@@ -89,7 +123,7 @@ public class Peice : MonoBehaviour
    private void rotate(int direction)
    {
       int ogRotationIndex = this.rotationIndex;
-      this.rotationIndex += wrap(this.rotationIndex + direction, 0, 4);
+      this.rotationIndex = wrap(this.rotationIndex + direction, 0, 4);
      applyRotationMatrix(direction);
      if (!testWallKicks(this.rotationIndex, direction))
      {
@@ -122,9 +156,9 @@ public class Peice : MonoBehaviour
       this.cells[i] = new Vector3Int(x, y, 0);
    }}
 
-   private bool testWallKicks(int rotationIndex, int rotationDirection)
+   private bool testWallKicks(int rotationindex, int rotationDirection)
    {
-      int wallKicksIndex = getWallKicksIndex(rotationIndex, rotationDirection);
+      int wallKicksIndex = getWallKicksIndex(rotationindex, rotationDirection);
       for (int i = 0; i < this.data.wallKicks.GetLength(1);i++)
       {
          Vector2Int translation = this.data.wallKicks[wallKicksIndex, i];
