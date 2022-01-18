@@ -44,7 +44,19 @@ public class Board : MonoBehaviour
     int random = Random.Range(0, this.tetrominoes.Length);
     TetrominoData data = this.tetrominoes[random];
     this.activePeice.Initialize(this,activePosition ,data);
-    set(this.activePeice);
+    if (isValidPosition(this.activePeice, this.activePosition))
+    {
+      set(this.activePeice);
+    }
+    else
+    {
+      gameover();
+    }
+  }
+
+  private void gameover()
+  {
+    this.tilemap.ClearAllTiles();
   }
 
   public void set(Peice peice)
@@ -84,5 +96,62 @@ public class Board : MonoBehaviour
     }
 
     return true;
+  }
+
+  public void clearLines()
+  {
+    RectInt bounds = this.bounds;
+    int row = bounds.yMin;
+
+    while (row < bounds.yMax)
+    {
+      if (isLineFull(row))
+      {
+        lineClear(row);
+      }
+      else
+      {
+        row++;
+      }
+    }
+
+  }
+
+  private bool isLineFull(int row)
+  {
+    RectInt bounds = this.bounds;
+    for (int col = bounds.xMin; col < bounds.xMax; col++)
+    {
+      Vector3Int position = new Vector3Int(col, row, 0);
+      if (!this.tilemap.HasTile(position))
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private void lineClear(int row)
+  {
+    RectInt bounds = this.bounds;
+    for (int col = bounds.xMin; col < bounds.xMax; col++)
+    {
+      Vector3Int position = new Vector3Int(col, row, 0);
+      this.tilemap.SetTile(position, null);
+    }
+
+    while (row < bounds.yMax)
+    {
+      for (int col = bounds.xMin; col < bounds.xMax; col++)
+      {
+        Vector3Int position = new Vector3Int(col, row+1, 0);
+        TileBase aboveTile = this.tilemap.GetTile(position);
+        position = new Vector3Int(col, row, 0);
+        this.tilemap.SetTile(position,aboveTile);
+      }
+
+      row++;
+    }
   }
 }

@@ -92,6 +92,7 @@ public class Peice : MonoBehaviour
    private void Lock()
    {
       this.board.set(this);
+      this.board.clearLines();
       this.board.spawn();
    }
 
